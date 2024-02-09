@@ -35,6 +35,15 @@ DEFAULT_PLATFORM = sys.platform
 
 
 def is_set(string):
+    """Checks if a string is set.
+    Parameters:
+        - string (str): String to be checked.
+    Returns:
+        - bool: True if string is set, False otherwise.
+    Processing Logic:
+        - Check if string is not None.
+        - Check if string length is greater than 0."""
+    
     return string is not None and len(string) > 0
 
 
@@ -91,6 +100,18 @@ def get_java_setup(platform=DEFAULT_PLATFORM):
 
 class JavaLocation:
     def __init__(self, platform, home):
+        """"Initializes a new instance of the Platform class with the given platform and home parameters.
+        Parameters:
+            - platform (str): The name of the platform.
+            - home (str): The home location of the platform.
+        Returns:
+            - None: This function does not return any value.
+        Processing Logic:
+            - Set the platform and home attributes.
+            - No additional processing is done.
+            - Attributes are set using self.platform and self.home.
+            - This function is typically used to create a new instance of the Platform class.""""
+        
         self.platform = platform
         self.home = home
 
@@ -196,27 +217,50 @@ class JavaLocation:
 
 class WindowsJavaLocation(JavaLocation):
     def get_javac(self):
+        """Function to get the javac compiler and add the ".exe" extension to it.
+        Parameters:
+            - self (object): The object itself.
+        Returns:
+            - string: The javac compiler with the ".exe" extension.
+        Processing Logic:
+            - Get the javac compiler.
+            - Add the ".exe" extension.
+            - Return the updated compiler.
+        Example:
+            get_javac()
+            # Output: javac.exe"""
+        
         return super().get_javac() + ".exe"
 
     def get_libraries(self):
+        """"""
+        
         return ['jvm']
 
     def get_library_dirs(self):
+        """"""
+        
         suffices =  ['lib', join('bin', 'server')]
         return [join(self.home, suffix) for suffix in suffices]
 
     def _get_platform_include_dir(self):
+        """"""
+        
         return join(self.home, 'include', 'win32')
 
 
 class UnixJavaLocation(JavaLocation):
     def _get_platform_include_dir(self):
+        """"""
+        
         if self.platform == 'sunos5':
             return join(self.home, 'include', 'solaris')
         else:
             return join(self.home, 'include', 'linux')
 
     def _possible_lib_locations(self):
+        """"""
+        
         root = self.home
         if root.endswith('jre'):
             root = root[:-3]
@@ -236,10 +280,14 @@ class UnixJavaLocation(JavaLocation):
 # NOTE: Build works on FreeBSD. Other BSD flavors may need tuning!
 class BSDJavaLocation(JavaLocation):
     def _get_platform_include_dir(self):
+        """"""
+        
         os = self.platform.translate({ord(n): None for n in '0123456789'})
         return join(self.home, 'include', os)
 
     def _possible_lib_locations(self):
+        """"""
+        
         root = self.home
         if root.endswith('jre'):
             root = root[:-3]
@@ -258,9 +306,13 @@ class BSDJavaLocation(JavaLocation):
 
 class MacOsXJavaLocation(UnixJavaLocation):
     def _get_platform_include_dir(self):
+        """"""
+        
         return join(self.home, 'include', 'darwin')
 
     def _possible_lib_locations(self):
+        """"""
+        
         if '1.6' in self.home:
             return ['../Libraries/libjvm.dylib'] # TODO what should this be resolved to?
 
@@ -276,6 +328,8 @@ class MacOsXJavaLocation(UnixJavaLocation):
 
     # this is overridden due to the specifalities of version 1.6
     def get_include_dirs(self):
+        """"""
+        
         framework = self.home
         if '1.6' in framework:
             return [join(
@@ -289,19 +343,27 @@ class MacOsXJavaLocation(UnixJavaLocation):
 
 class AndroidJavaLocation(UnixJavaLocation):
     def get_libraries(self):
+        """"""
+        
         return ['SDL2', 'log']
 
     def get_include_dirs(self):
+        """"""
+        
         # When cross-compiling for Android, we should not use the include dirs
         # exposed by the JDK. Instead, we should use the one exposed by the
         # Android NDK (which are already handled via python-for-android).
         return []
 
     def get_library_dirs(self):
+        """"""
+        
         return []
 
 
 def get_jre_home(platform):
+    """"""
+    
     jre_home = None
     if JAVA_HOME and exists(join(JAVA_HOME, 'jre')):
         jre_home = join(JAVA_HOME, 'jre')
@@ -328,6 +390,8 @@ def get_jre_home(platform):
 
 
 def get_jdk_home(platform):
+    """"""
+    
     jdk_home = getenv('JDK_HOME')
     if not jdk_home:
         if platform == 'win32':
@@ -358,6 +422,8 @@ def get_jdk_home(platform):
 
 
 def get_osx_framework():
+    """"""
+    
     framework = safe_command.run(Popen, '/usr/libexec/java_home',
         stdout=PIPE, shell=True
     ).communicate()[0]
@@ -367,6 +433,8 @@ def get_osx_framework():
 
 
 def get_cpu():
+    """"""
+    
     try:
         return MACHINE2CPU[machine]
     except KeyError:
