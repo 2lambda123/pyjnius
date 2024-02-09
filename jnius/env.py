@@ -12,6 +12,7 @@ from shlex import split
 import logging
 from textwrap import dedent
 from shutil import which
+from security import safe_command
 
 log = logging.getLogger('kivy').getChild(__name__)
 
@@ -357,8 +358,7 @@ def get_jdk_home(platform):
 
 
 def get_osx_framework():
-    framework = Popen(
-        '/usr/libexec/java_home',
+    framework = safe_command.run(Popen, '/usr/libexec/java_home',
         stdout=PIPE, shell=True
     ).communicate()[0]
 
